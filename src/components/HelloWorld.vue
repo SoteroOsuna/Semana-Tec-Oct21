@@ -1,58 +1,62 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <v-container>
+    <h2>Hola {{usuario.nombre}} {{usuario.apellido}}, presionaste {{contador}} veces el botón</h2>
+    <v-card style="padding:40px;">
+    <v-text-field
+      id="nombre"
+      v-model="usuario.nombre"
+      label="Dime tu nombre"
+      hide-details="auto"
+    ></v-text-field>
+    <v-text-field
+    id="apellido"
+      v-model="usuario.apellido"
+      label="Dime tu apellido"
+      hide-details="auto"
+    ></v-text-field>    
+    <div style="margin-top:20px;">Contador {{contador}}</div>
+    <v-btn id="botonAgregar"  style="margin-top:20px;" elevation="2" @click="agregarAlContador" dark color="purple">Aumentar contador</v-btn>      
+    </v-card>
+    <h2 v-if="cargandoPokemones">Cargando pokemones...</h2>
+    <v-row v-if="!cargandoPokemones" style="margin-top:30px;">
+      <v-col @click="irADetalleDePokemon(pokemon.name)" cols="3" v-for="pokemon in pokemones" v-bind:key="pokemon.name">
+        <v-card style="padding:20px">
+          <h3>{{pokemon.name}}</h3>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
-</script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+  export default {
+    name: 'HelloWorld',
+
+    mounted(){
+      this.axios.get('https://pokeapi.co/api/v2/pokemon').then((response)=>{
+        console.log(response);
+        this.pokemones=response.data.results;
+        this.cargandoPokemones=false;
+      })
+    },
+
+    methods:{
+      irADetalleDePokemon(pokemon){
+        this.$router.push('/pokemon/'+pokemon);
+      },
+      agregarAlContador(){
+        this.contador=this.contador+1;
+      }
+    },
+    data: () => ({
+      pokemones:[],
+      cargandoPokemones:true,
+      contador:0,
+      usuario:{
+        nombre:"",
+        apellido:""
+      }
+    }),
+  }
+</script>
